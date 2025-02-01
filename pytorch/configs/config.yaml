@@ -1,7 +1,7 @@
 trainer:
   name: Trainer
-  num_epochs: 20
-  model_dir: ./model/ResNet18
+  num_epochs: 13
+  model_dir: ./model/ResNet34
 
 dataset:
   name: MNIST
@@ -9,8 +9,13 @@ dataset:
 
 model:
   name: ResNet
-  arch: 18
-        #18, 34, 50, 101, 152
+  arch: 34
+  num_classes: 10
+        #18, 34
+
+# model: 
+#   name: MobileNetV3
+#   num_classes: 10
 
 optimizer:
   name: Adam
@@ -18,4 +23,4 @@ optimizer:
 
 scheduler:
   name: StepLR
-  step_size: 10
+  step_size: 4

@@ -33,7 +33,8 @@ class MobileNet(nn.Module):
     def __init__(self, num_classes=1000, width_mult=1.0, shallow=False):
         super(MobileNet, self).__init__()
         self.features = nn.Sequential(*self.make_layers(width_mult, shallow))
-        self.avg_pool = nn.AvgPool2d(7, stride=1)
+        # self.avg_pool = nn.AvgPool2d(7, stride=1)
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Linear(nearby_int(width_mult * 1024), num_classes)
         self._initialize_weights()
     def forward(self, x):
@@ -62,7 +63,7 @@ class MobileNet(nn.Module):
         ]
 
         layers = []
-        in_channels = 3
+        in_channels = 1
         for i, (filters, stride) in enumerate(settings):
             out_channels = nearby_int(width_mult * filters)
             if i == 0:

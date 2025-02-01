@@ -92,14 +92,21 @@ class MobileNetV3(nn.Module):
         super(MobileNetV3, self).__init__()
         
         self.features = nn.Sequential(*self.get_layers())
-        self.avg_pool = nn.AvgPool2d(7)
+        # self.avg_pool = nn.AvgPool2d(7)
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Sequential(
-            nn.Linear(960, 1280), 
-            nn.BatchNorm1d(1280), 
+            nn.Linear(576, 1024), 
+            nn.BatchNorm1d(1024), 
             h_swish(), 
-            nn.Linear(1280, num_classes), 
+            nn.Linear(1024, num_classes), 
             nn.Softmax(dim=1)
         )
+        # self.classifier = nn.Sequential(
+        #     nn.Conv2d(576, 1024, kernel_size=1, stride=1, padding=0),
+        #     h_swish(),
+        #     nn.Conv2d(1024, num_classes, kernel_size=1, stride=1, padding=0),
+        # )
+        self.softmax = nn.Softmax(dim=1)
         self._initialize_weights()
         
     def forward(self, x):
@@ -107,6 +114,7 @@ class MobileNetV3(nn.Module):
         x = self.avg_pool(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
+        # x = self.softmax(x)
         
         return x
     
@@ -145,14 +153,14 @@ class MobileNetV3(nn.Module):
             [5,  576,   96,  1,  1, 1],
             ]
         
-        layers = [ConvBNHSwish(3, 16, kernel_size=3, stride=2, padding=1)]
+        layers = [ConvBNHSwish(1, 16, kernel_size=3, stride=2, padding=1)]
         input_channel = _make_divisible(16, 8)
         for kernal, exp_size, output_channel, use_se, use_hs, stride in cfgs:
             output_channel = _make_divisible(output_channel, 8)
             exp_size = _make_divisible(exp_size, 8)
             layers.append(InvertedResidual(input_channel, exp_size, output_channel, kernal, stride, use_se, use_hs))
             input_channel = output_channel
-        layers.append(ConvBNHSwish(input_channel, 960, kernel_size=1, stride=1, padding=0))
+        layers.append(ConvBNHSwish(input_channel, 576, kernel_size=1, stride=1, padding=0))
         return layers
     
     def _initialize_weights(self):
