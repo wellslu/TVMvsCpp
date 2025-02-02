@@ -169,3 +169,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+
+
+# custum ignore
+.vscode/
+**/mlruns/
+MNIST/
+CIFAR-10/
+*.pth
+*.pt
