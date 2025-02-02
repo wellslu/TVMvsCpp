@@ -1,0 +1,26 @@
+trainer:
+  name: Trainer
+  num_epochs: 13
+  model_dir: ./model/ResNet34
+
+dataset:
+  name: MNIST
+  batch_size: 64
+
+model:
+  name: ResNet
+  arch: 34
+  num_classes: 10
+        #18, 34
+
+# model: 
+#   name: MobileNetV3
+#   num_classes: 10
+
+optimizer:
+  name: Adam
+  lr: 1.e-3
+
+scheduler:
+  name: StepLR
+  step_size: 4
