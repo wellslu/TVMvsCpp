@@ -116,7 +116,8 @@ class Trainer(AbstractTrainer):
             'best_acc': self.best_acc
         }
 
-        torch.save(checkpoint, f)
+        # torch.save(checkpoint, f)
+        torch.save(self.model.state_dict(), f)
         mlflow.log_artifact(f)
 
     def resume(self, f):
