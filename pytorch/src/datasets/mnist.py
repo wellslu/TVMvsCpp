@@ -9,7 +9,7 @@ from PIL import Image
 @mlconfig.register
 class MNIST(data.DataLoader):
 
-    def __init__(self, batch_size: int, train: bool, **kwargs):
+    def __init__(self, data_path, batch_size: int, train: bool, **kwargs):
         transform = transforms.Compose([
             # transforms.Resize((28,28)),
             transforms.ToTensor(),
@@ -17,8 +17,8 @@ class MNIST(data.DataLoader):
         ])
 
         if train:
-            dataset = datasets.MNIST('./data/mnist', train=True, download=True, transform=transform)
+            dataset = datasets.MNIST(data_path, train=True, download=True, transform=transform)
         else:
-            dataset = datasets.MNIST('./data/mnist', train=False, transform=transform)
+            dataset = datasets.MNIST(data_path, train=False, transform=transform)
 
         super(MNIST, self).__init__(dataset=dataset, batch_size=batch_size, shuffle=train, **kwargs)

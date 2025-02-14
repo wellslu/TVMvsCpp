@@ -1,15 +1,18 @@
 import unittest
+import sys
+import os
 
 import torch
+from src.models import ResNet
 
-from src.models import VGG
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class TestModels(unittest.TestCase):
 
-    def test_vgg(self):
-        m = ResNet()
-        x = torch.randn(1, 3, 224, 224)
+    def test_resnet(self):
+        m = ResNet(18, 10)
+        x = torch.randn(1, 1, 64, 64)
         with torch.no_grad():
             y = m(x)
 

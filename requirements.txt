@@ -5,7 +5,7 @@ mlconfig==0.1.7
 mlflow==1.28.0
 Pillow==8.4.0
 opencv-python==4.6.0.66
-numpy==1.19.5
+numpy==1.26.4
 imgaug==0.4.0
 tqdm==4.64.0
 pyyaml==6.0.2
