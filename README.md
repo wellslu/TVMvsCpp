@@ -30,9 +30,9 @@ pip install -e .
 !!! check libstdc++.so.6, libtvm.so path
 
 ## Step
-- [] TVM compile file
-- [] TVM inference file
-- [] Dockerfile
+- [ ] TVM compile file
+- [ ] TVM inference file
+- [ ] Dockerfile
 
 # raspberry pi 3 B+
 - 4 cores

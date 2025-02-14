@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git vim && rm -rf /var/lib/apt/lists/*
 
 # Clone TVM
-ARG TVM_VERSION=v0.8.0
+ARG TVM_VERSION=main
 ARG GIT_URL=https://github.com/apache/tvm
 RUN git clone --recursive ${GIT_URL} /tvm
 WORKDIR /tvm
@@ -39,26 +39,26 @@ RUN cmake -S .. -B . -DUSE_LLVM=ON -DUSE_MICRO=OFF -DUSE_RELAY=ERROR \
 # Run make to build TVM
 RUN make -j$(nproc) || (cat CMakeFiles/CMakeError.log && false)
 
-# # # Install Python dependencies
-# RUN pip3 --no-cache-dir install \
-#         cython \ 
-#         numpy==1.19.5 \
-#         torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
-#         opencv-python==4.6.0.66 \
-#         pyyaml==6.0.2 \
-#         tqdm==4.64.0 \
-#         scipy==1.5.4 \
-#         requests==2.32.3 \
-#         mlconfig==0.1.7 mlflow==1.28.0 \
-#         Pillow==8.4.0 \
-#         entrypoints==0.4
+# Install Python dependencies
+RUN pip3 --no-cache-dir install \
+        cython \ 
+        numpy==1.19.5 \
+        torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
+        opencv-python==4.6.0.66 \
+        pyyaml==6.0.2 \
+        tqdm==4.64.0 \
+        scipy==1.5.4 \
+        requests==2.32.3 \
+        mlconfig==0.1.7 mlflow==1.28.0 \
+        Pillow==11.1.0 \
+        entrypoints==0.4
 
 # Set environment variables
 ENV TVM_HOME=/tvm
 ENV PYTHONPATH=${TVM_HOME}/python:${PYTHONPATH}
 
-# Package TVM build for easy transfer to Raspberry Pi
-RUN tar -cf /tvm_rpi3.tar /tvm
+# # Package TVM build for easy transfer to Raspberry Pi
+# RUN tar -cf /tvm_rpi3.tar /tvm
 
-# Entry point: Extract the build and set up TVM environment
-CMD ["bash", "-c", "tar -xf /tvm_rpi3.tar -C / && bash"]
+# # Entry point: Extract the build and set up TVM environment
+# CMD ["bash", "-c", "tar -xf /tvm_rpi3.tar -C / && bash"]
