@@ -33,8 +33,8 @@ def main():
     model = config.model().to(device)
     optimizer = config.optimizer(model.parameters())
     scheduler = config.scheduler(optimizer)
-    train_loader = config.dataset(train=True)
-    test_loader = config.dataset(train=False)
+    train_loader = config.dataset(data_path='./data/mnist', train=True)
+    test_loader = config.dataset(data_path='./data/mnist', train=False)
 
     trainer = config.trainer(device, model, optimizer, scheduler, train_loader, test_loader)
 
