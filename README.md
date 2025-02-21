@@ -11,7 +11,7 @@ As AI models become more powerful, they continue to grow in size, efficiency oft
 - Compare two methods’(TVM and C++) inference speed, accuracy and memory cost. 
 
 # Git Clone
-## First time clone the repo have to "git submodule update --init --recursive" to init submodule TVM. 
+!!! First time clone the repo have to "git submodule update --init --recursive" to init submodule TVM. 
 
 # TVM
 tvm folder clone from https://github.com/apache/tvm
