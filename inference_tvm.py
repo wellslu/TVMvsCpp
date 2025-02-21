@@ -8,8 +8,8 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', type=str, default="deploy.tar")
-    parser.add_argument('-i', '--image', type=str, default="path/to/image.jpg")
+    parser.add_argument('-m', '--model', type=str, default="tvm_x86.tar")
+    parser.add_argument('-i', '--image', type=str, default="3.png")
     return parser.parse_args()
 
 def main():
@@ -22,7 +22,8 @@ def main():
     module = graph_executor.GraphModule(lib["default"](dev))
 
     transform = transforms.Compose([
-            # transforms.Resize((28,28)),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.Resize((28,28)),
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))
         ])
@@ -35,6 +36,7 @@ def main():
     module.run()
     output = module.get_output(0).asnumpy()
 
+    # print(f"Prediction: {output}")
     print(f"Prediction: {np.argmax(output)}")
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ As AI models become more powerful, they continue to grow in size, efficiency oft
 - Compile C++ source code on raspberry pi 2 B+, and make sure the output is still the same as our expectation. 
 - Compare two methods’(TVM and C++) inference speed, accuracy and memory cost. 
 
+# Git Clone
+## First time clone the repo have to "git submodule update --init --recursive" to init submodule TVM. 
+
 # TVM
 tvm folder clone from https://github.com/apache/tvm
 <br>
@@ -29,13 +32,11 @@ pip install -e .
 <br>
 !!! check libstdc++.so.6, libtvm.so path
 
-## Step
-- [ ] TVM compile file
-- [ ] TVM inference file
-- [ ] Dockerfile
-
 # raspberry pi 3 B+
 - 4 cores
 - RAM 900 Mb
 - Swp 200 Mb
 - storage 32 Gb
+
+# Docker
+Docker still can't build on raspberry pi 3 b, it will shutdown by itself. 

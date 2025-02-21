@@ -15,11 +15,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git vim && rm -rf /var/lib/apt/lists/*
 
 # Clone TVM
-ARG TVM_VERSION=main
-ARG GIT_URL=https://github.com/apache/tvm
-RUN git clone --recursive ${GIT_URL} /tvm
-WORKDIR /tvm
-RUN git checkout ${TVM_VERSION}
+# ARG TVM_VERSION=main
+# ARG GIT_URL=https://github.com/apache/tvm
+# RUN git clone --recursive ${GIT_URL} /tvm
+# WORKDIR /tvm
+# RUN git checkout ${TVM_VERSION}
+COPY tvm /tvm
 
 # Prepare build directory
 RUN mkdir -p /tvm/build
