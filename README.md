@@ -11,14 +11,17 @@ As AI models become more powerful, they continue to grow in size, efficiency oft
 - Compare two methods’(TVM and C++) inference speed, accuracy and memory cost. 
 
 # Git Clone
-!!! First time clone the repo have to "git submodule update --init --recursive" to init submodule TVM. 
+clone all moudule by: 
+<br>
+```bash
+git clone --recursive https://github.com/wellslu/TVMvsCpp.git
+```
 
 # TVM
-tvm folder clone from https://github.com/apache/tvm
 <br>
-here is the install steps: 
+here is the steps to install compile and runtime components: 
 ```bash
-git clone --recursive https://github.com/apache/tvm tvm
+# git clone --recursive https://github.com/apache/tvm tvm
 cd tvm
 mkdir build
 cp cmake/config.cmake build/
@@ -38,5 +41,10 @@ pip install -e .
 - Swp 200 Mb
 - storage 32 Gb
 
-# Docker
-Docker still can't build on raspberry pi 3 b, it will shutdown by itself. 
+# Docker (Cross-Compilation; can run but the version have to be checked)
+Run docker on your x86 processor and compile ARM TVM version. 
+<br>
+```bash
+docker build -t tvm_image .
+docker run -it --name tvm_crossCompile tvm_image
+```
