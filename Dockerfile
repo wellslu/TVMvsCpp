@@ -47,34 +47,44 @@ RUN cmake .. \
     -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc \
     -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ \
     || (cat CMakeFiles/CMakeError.log && false)
+# cmake .. \
+    # -DUSE_LLVM=OFF \
+    # -DUSE_CPP_RPC=ON \
+    # -DUSE_LIBBACKTRACE=OFF \
+    # -DCMAKE_SYSTEM_NAME=Linux \
+    # -DCMAKE_SYSTEM_PROCESSOR=armv7 \
+    # -DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc \
+    # -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++
+    # -DCMAKE_CXX_FLAGS="-march=armv7-a -mfpu=neon -mfloat-abi=hard" \
+    # -DCMAKE_C_FLAGS="-march=armv7-a -mfpu=neon -mfloat-abi=hard"
 
 
 
 # Run make to build TVM
-# RUN make -j2 || (cat CMakeFiles/CMakeError.log && false)
+# RUN make -j$(nproc) || (cat CMakeFiles/CMakeError.log && false)
 RUN make runtime -j$(nproc) || (cat CMakeFiles/CMakeError.log && false)
 
-# Set environment variables
-ENV TVM_HOME=/tvm
-ENV PATH="$TVM_HOME/build:$PATH"
-ENV PYTHONPATH="$TVM_HOME/python:$PYTHONPATH"
-ENV LD_LIBRARY_PATH="$TVM_HOME/build:$LD_LIBRARY_PATH"
+# # Set environment variables
+# ENV TVM_HOME=/tvm
+# ENV PATH="$TVM_HOME/build:$PATH"
+# ENV PYTHONPATH="$TVM_HOME/python:$PYTHONPATH"
+# ENV LD_LIBRARY_PATH="$TVM_HOME/build:$LD_LIBRARY_PATH"
 
 
 
-# Install Python dependencies
-RUN pip3 --no-cache-dir install \
-        cython \ 
-        numpy==1.24.4 \
-        torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
-        opencv-python==4.6.0.66 \
-        pyyaml==6.0.2 \
-        tqdm==4.64.0 \
-        scipy==1.5.4 \
-        requests==2.32.3 \
-        mlconfig==0.1.7 mlflow==1.28.0 \
-        Pillow==11.1.0 \
-        entrypoints==0.4
+# # Install Python dependencies
+# RUN pip3 --no-cache-dir install \
+#         cython \ 
+#         numpy==1.24.4 \
+#         torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
+#         opencv-python==4.6.0.66 \
+#         pyyaml==6.0.2 \
+#         tqdm==4.64.0 \
+#         scipy==1.5.4 \
+#         requests==2.32.3 \
+#         mlconfig==0.1.7 mlflow==1.28.0 \
+#         Pillow==11.1.0 \
+#         entrypoints==0.4
 
 # # # Package TVM build for easy transfer to Raspberry Pi
 # # RUN tar -cf /tvm_rpi3.tar /tvm
