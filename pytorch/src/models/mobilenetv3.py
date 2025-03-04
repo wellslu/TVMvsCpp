@@ -88,24 +88,28 @@ class InvertedResidual(nn.Module):
 @mlconfig.register
 class MobileNetV3(nn.Module):
 
-    def __init__(self, num_classes=2, shallow=False):
+    def __init__(self, num_classes=2, shallow=False, size='small'):
         super(MobileNetV3, self).__init__()
         
-        self.features = nn.Sequential(*self.get_layers())
+        self.features = nn.Sequential(*self.get_layers(size))
         # self.avg_pool = nn.AvgPool2d(7)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.classifier = nn.Sequential(
-            nn.Linear(960, 1024), 
-            nn.BatchNorm1d(1024), 
-            h_swish(), 
-            nn.Linear(1024, num_classes), 
-            nn.Softmax(dim=1)
-        )
-        # self.classifier = nn.Sequential(
-        #     nn.Conv2d(576, 1024, kernel_size=1, stride=1, padding=0),
-        #     h_swish(),
-        #     nn.Conv2d(1024, num_classes, kernel_size=1, stride=1, padding=0),
-        # )
+        if size == 'large':
+            self.classifier = nn.Sequential(
+                nn.Linear(960, 1024), 
+                nn.BatchNorm1d(1024), 
+                h_swish(), 
+                nn.Linear(1024, num_classes), 
+                nn.Softmax(dim=1)
+            )
+        elif size == 'small':
+            self.classifier = nn.Sequential(
+                nn.Linear(576, 1024), 
+                nn.BatchNorm1d(1024), 
+                h_swish(), 
+                nn.Linear(1024, num_classes), 
+                nn.Softmax(dim=1)
+            )
         self.softmax = nn.Softmax(dim=1)
         self._initialize_weights()
         
@@ -119,39 +123,41 @@ class MobileNetV3(nn.Module):
         return x
     
     @staticmethod
-    def get_layers():
-        cfgs = [
-           # k,  ex,  oup,  SE, HS, s
-            [3,   16,   16,  0,  0, 1],
-            [3,   64,   24,  0,  0, 2],
-            [3,   72,   24,  0,  0, 1],
-            [5,   72,   40,  1,  0, 2],
-            [5,  120,   40,  1,  0, 1],
-            [5,  120,   40,  1,  0, 1],
-            [3,  240,   80,  0,  1, 2],
-            [3,  200,   80,  0,  1, 1],
-            [3,  184,   80,  0,  1, 1],
-            [3,  184,   80,  0,  1, 1],
-            [3,  480,  112,  1,  1, 1],
-            [3,  672,  112,  1,  1, 1],
-            [5,  672,  160,  1,  1, 2],
-            [5,  960,  160,  1,  1, 1],
-            [5,  960,  160,  1,  1, 1],
-            ]
-        # cfgs = [
-        #    # k,  ex,  oup,  SE, HS, s
-        #     [3,   16,   16,  1,  0, 2],
-        #     [3,   72,   24,  0,  0, 2],
-        #     [3,   88,   24,  0,  0, 1],
-        #     [5,   96,   40,  1,  1, 2],
-        #     [5,  240,   40,  1,  1, 1],
-        #     [5,  240,   40,  1,  1, 1],
-        #     [5,  120,   48,  1,  1, 1],
-        #     [5,  144,   48,  1,  1, 1],
-        #     [5,  288,   96,  1,  1, 2],
-        #     [5,  576,   96,  1,  1, 1],
-        #     [5,  576,   96,  1,  1, 1],
-        #     ]
+    def get_layers(size='large'):
+        if size == 'large':
+            cfgs = [
+            # k,  ex,  oup,  SE, HS, s
+                [3,   16,   16,  0,  0, 1],
+                [3,   64,   24,  0,  0, 2],
+                [3,   72,   24,  0,  0, 1],
+                [5,   72,   40,  1,  0, 2],
+                [5,  120,   40,  1,  0, 1],
+                [5,  120,   40,  1,  0, 1],
+                [3,  240,   80,  0,  1, 2],
+                [3,  200,   80,  0,  1, 1],
+                [3,  184,   80,  0,  1, 1],
+                [3,  184,   80,  0,  1, 1],
+                [3,  480,  112,  1,  1, 1],
+                [3,  672,  112,  1,  1, 1],
+                [5,  672,  160,  1,  1, 2],
+                [5,  960,  160,  1,  1, 1],
+                [5,  960,  160,  1,  1, 1],
+                ]
+        elif size == 'small':
+            cfgs = [
+            # k,  ex,  oup,  SE, HS, s
+                [3,   16,   16,  1,  0, 2],
+                [3,   72,   24,  0,  0, 2],
+                [3,   88,   24,  0,  0, 1],
+                [5,   96,   40,  1,  1, 2],
+                [5,  240,   40,  1,  1, 1],
+                [5,  240,   40,  1,  1, 1],
+                [5,  120,   48,  1,  1, 1],
+                [5,  144,   48,  1,  1, 1],
+                [5,  288,   96,  1,  1, 2],
+                [5,  576,   96,  1,  1, 1],
+                [5,  576,   96,  1,  1, 1],
+                ]
         
         layers = [ConvBNHSwish(1, 16, kernel_size=3, stride=2, padding=1)]
         input_channel = _make_divisible(16, 8)
@@ -160,7 +166,10 @@ class MobileNetV3(nn.Module):
             exp_size = _make_divisible(exp_size, 8)
             layers.append(InvertedResidual(input_channel, exp_size, output_channel, kernal, stride, use_se, use_hs))
             input_channel = output_channel
-        layers.append(ConvBNHSwish(input_channel, 960, kernel_size=1, stride=1, padding=0))
+        if size == 'large':
+            layers.append(ConvBNHSwish(input_channel, 960, kernel_size=1, stride=1, padding=0))
+        elif size == 'small':
+            layers.append(ConvBNHSwish(input_channel, 576, kernel_size=1, stride=1, padding=0))
         return layers
     
     def _initialize_weights(self):

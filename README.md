@@ -17,9 +17,9 @@ clone all moudule by:
 git clone --recursive https://github.com/wellslu/TVMvsCpp.git
 ```
 
-# TVM
-<br>
+# TVM (compile on x86)
 here is the steps to install compile and runtime components: 
+<br>
 ```bash
 # git clone --recursive https://github.com/apache/tvm tvm
 cd tvm
@@ -37,12 +37,13 @@ pip install -e .
 
 # raspberry pi 3 B+
 - 4 cores
+- aarch64 (not 32-bit armv7!!!)
 - RAM 900 Mb
-- Swp 200 Mb
+- Swp 2 Gb
 - storage 32 Gb
 
-# Docker (Cross-Compilation; can run but the version have to be checked)
-Run docker on your x86 processor and compile ARM TVM version. 
+# Docker (Cross-Compilation)
+You can build it on x86 first, and move libtvm_runtime.so to the raspberry pi 3 b. It also can be built on the raspberry pi 3 b directly if your device won't crash. 
 <br>
 ```bash
 docker build -t tvm_image .
