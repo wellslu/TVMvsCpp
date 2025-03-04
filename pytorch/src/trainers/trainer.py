@@ -46,7 +46,7 @@ class Trainer(AbstractTrainer):
             test_loss, test_acc = self.evaluate()
             self.scheduler.step()
 
-            self.save_checkpoint('checkpoint.pth')
+            # self.save_checkpoint('checkpoint.pth')
 
             metrics = dict(train_loss=train_loss.value,
                            train_acc=train_acc.value,
@@ -108,13 +108,13 @@ class Trainer(AbstractTrainer):
     def save_checkpoint(self, f):
         self.model.eval()
 
-        checkpoint = {
-            'model': self.model.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
-            'scheduler': self.scheduler.state_dict(),
-            'epoch': self.epoch,
-            'best_acc': self.best_acc
-        }
+        # checkpoint = {
+        #     'model': self.model.state_dict(),
+        #     'optimizer': self.optimizer.state_dict(),
+        #     'scheduler': self.scheduler.state_dict(),
+        #     'epoch': self.epoch,
+        #     'best_acc': self.best_acc
+        # }
 
         # torch.save(checkpoint, f)
         torch.save(self.model.state_dict(), f)
