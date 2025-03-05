@@ -17,10 +17,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 
 # Upgrade CMake to version 3.22.2 (if default is outdated)
-RUN cd /tmp \
-    && wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.tar.gz \
-    && tar -xzf cmake-3.22.2-linux-x86_64.tar.gz -C /usr/local --strip-components=1 \
-    && rm -rf cmake-3.22.2-linux-x86_64.tar.gz
+RUN arch=$(uname -m) && \
+    if [ "$arch" = "x86_64" ]; then \
+      echo "Detected x86_64 architecture ($arch)"; \
+      wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.tar.gz && \
+      tar -xzf cmake-3.22.2-linux-x86_64.tar.gz -C /usr/local --strip-components=1 && \
+      rm -rf cmake-3.22.2-linux-x86_64.tar.gz; \
+    else \
+      echo "Detected ARM architecture ($arch)"; \
+      wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-aarch64.tar.gz && \
+      tar -xzf cmake-3.22.2-linux-aarch64.tar.gz -C /usr/local --strip-components=1 && \
+      rm -rf cmake-3.22.2-linux-aarch64.tar.gz; \
+    fi
 
 # Verify CMake version
 RUN cmake --version
