@@ -80,5 +80,5 @@ RUN pip3 --no-cache-dir install \
         scipy==1.5.4 \
         requests==2.32.3 \
         mlconfig==0.1.7 mlflow==1.28.0 \
-        Pillow==11.1.0 \
+        Pillow==8.4.0 \
         entrypoints==0.4
