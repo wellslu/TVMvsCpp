@@ -4,13 +4,21 @@ from torchvision import transforms
 import numpy as np
 from PIL import Image
 import time
+import os
 import argparse
+
+if os.path.exists("log") == False:
+    os.mkdir("log")
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--model', type=str, default='MobileNet')
     parser.add_argument('-i', '--image', type=str, default="3.png")
     return parser.parse_args()
+
+def log(msg, model_name):
+    with open(f"log/{model_name}_pytorch_speed.log", "a") as f:
+        f.write(msg + "\n")
 
 def decode_model_name(model_name):
     model_path = f"pytorch/model/{model_name}.pth"
@@ -41,7 +49,8 @@ def main():
             transforms.Normalize((0.1307,), (0.3081,))
         ])
     
-    start = time.time()
+    # start = time.time()
+    log(f"Start inference 1000 times with {args.model}: {time.time()}", args.model)
 
     for i in range(1000):
         img = Image.open(args.image)
@@ -49,7 +58,10 @@ def main():
         input_data = data.reshape(1, 1, 28, 28)
         output = model(input_data)
 
-    print(f"Inference 1000 times with reload the same image: {time.time() - start}")
+    log(f"End inference 1000 times with {args.model}: {time.time()}", args.model)
+    # print(f"Inference 1000 times with reload the same image: {time.time() - start}")
+
+    print("Done")
 
 if __name__ == "__main__":
     main()
