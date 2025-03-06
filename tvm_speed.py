@@ -42,7 +42,7 @@ def main():
     # start = time.time()
     log(f"Start inference 1000 times with {model_name}: {time.time()}", model_name)
 
-    for i in range(1000):
+    for i in range(1):
         img = Image.open(args.image)
         data = transform(img)
         input_data = data.reshape(1, 1, 28, 28)

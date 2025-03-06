@@ -28,6 +28,12 @@ def decode_model_name(model_name):
         return models.ResNet(18, 10), model_path
     elif model_name == "ResNet34":
         return models.ResNet(34, 10), model_path
+    elif model_name == "ResNet50":
+        return models.ResNet(50, 10), model_path
+    elif model_name == "ResNet101":
+        return models.ResNet(101, 10), model_path
+    elif model_name == "ResNet152":
+        return models.ResNet(152, 10), model_path
     elif model_name == "MobileNet":
         return models.MobileNet(10), model_path
     else:
@@ -54,7 +60,7 @@ def main():
     # start = time.time()
     log(f"Start inference 1000 times with {args.model}: {time.time()}", args.model)
 
-    for i in range(1000):
+    for i in range(1):
         img = Image.open(args.image)
         data = transform(img)
         input_data = data.reshape(1, 1, 28, 28)
