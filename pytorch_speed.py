@@ -1,3 +1,5 @@
+input("Press Enter to continue...")
+
 import torch
 import pytorch.src.models as models
 from torchvision import transforms

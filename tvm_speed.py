@@ -1,3 +1,5 @@
+input("Press Enter to continue...")
+
 import tvm
 from tvm.contrib import graph_executor
 from torchvision import transforms
