@@ -12,7 +12,7 @@ if os.path.exists("log") == False:
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', type=str, default="tvm_x86.so")
+    parser.add_argument('-m', '--model', type=str, default="tvm_x86")
     parser.add_argument('-i', '--image', type=str, default="3.png")
     return parser.parse_args()
 
@@ -25,7 +25,7 @@ def main():
     model_name = args.model
 
     # Load the compiled model
-    lib = tvm.runtime.load_module(f"tvm_model/{model_name}")
+    lib = tvm.runtime.load_module(f"tvm_model/{model_name}.so")
 
     dev = tvm.cpu()
     module = graph_executor.GraphModule(lib["default"](dev))

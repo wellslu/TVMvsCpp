@@ -117,7 +117,9 @@ class Trainer(AbstractTrainer):
         # }
 
         # torch.save(checkpoint, f)
+        self.model.to('cpu')
         torch.save(self.model.state_dict(), f)
+        self.model.to(self.device)
         mlflow.log_artifact(f)
 
     def resume(self, f):
