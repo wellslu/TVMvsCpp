@@ -1,3 +1,5 @@
+input("Press Enter to continue...")
+
 import tvm
 from tvm.contrib import graph_executor
 from torchvision import transforms
@@ -12,7 +14,7 @@ if os.path.exists("log") == False:
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', type=str, default="tvm_x86.so")
+    parser.add_argument('-m', '--model', type=str, default="tvm_x86")
     parser.add_argument('-i', '--image', type=str, default="3.png")
     return parser.parse_args()
 
@@ -25,7 +27,7 @@ def main():
     model_name = args.model
 
     # Load the compiled model
-    lib = tvm.runtime.load_module(f"tvm_model/{model_name}")
+    lib = tvm.runtime.load_module(f"tvm_model/{model_name}.so")
 
     dev = tvm.cpu()
     module = graph_executor.GraphModule(lib["default"](dev))
@@ -40,7 +42,7 @@ def main():
     # start = time.time()
     log(f"Start inference 1000 times with {model_name}: {time.time()}", model_name)
 
-    for i in range(1000):
+    for i in range(1):
         img = Image.open(args.image)
         data = transform(img)
         input_data = data.reshape(1, 1, 28, 28)
