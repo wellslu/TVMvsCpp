@@ -36,6 +36,12 @@ def decode_model_name(model_name):
         return models.ResNet(152, 10), model_path
     elif model_name == "MobileNet":
         return models.MobileNet(10), model_path
+    elif model_name == "MobileNetV2":
+        return models.MobileNetV2(10), model_path
+    elif model_name == "MobileNetV3":
+        return models.MobileNetV3(10), model_path
+    elif model_name == "MobileNetV3-large":
+        return models.MobileNetV3(num_classes=10, size="large"), model_path
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 

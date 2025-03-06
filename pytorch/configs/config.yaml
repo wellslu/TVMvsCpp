@@ -1,7 +1,7 @@
 trainer:
   name: Trainer
   num_epochs: 13
-  model_dir: ./model/ResNet18
+  model_dir: ./model/ResNet152
 
 dataset:
   name: MNIST
@@ -9,7 +9,7 @@ dataset:
 
 model:
   name: ResNet
-  arch: 18 #18, 34, 50, 101, 152
+  arch: 152 #18, 34, 50, 101, 152
   num_classes: 10
 
 # model: 
