@@ -2,33 +2,45 @@ import mlconfig
 from torch import nn
 import torch.nn.functional as F
 
-archs = {18: [[64, 64, 2], [64,128,2], [128,256,2], [256,512,2]],
-         34: [[64, 64, 3], [64,128,4], [128,256,6], [256,512,3]],
-         50: [[64, 256, 3], [256, 512, 4], [512, 1024, 6], [1024, 2048, 3]],
-        101: [[64, 256, 3], [256, 512, 4], [512, 1024, 23], [1024, 2048, 3]],
-        152: [[64, 256, 3], [256, 512, 8], [512, 1024, 36], [1024, 2048, 3]],
-         }
+archs = {
+    18: [[64, 64, 2], [64, 128, 2], [128, 256, 2], [256, 512, 2]],
+    34: [[64, 64, 3], [64, 128, 4], [128, 256, 6], [256, 512, 3]],
+    50: [[64, 256, 3], [256, 512, 4], [512, 1024, 6], [1024, 2048, 3]],
+    101: [[64, 256, 3], [256, 512, 4], [512, 1024, 23], [1024, 2048, 3]],
+    152: [[64, 256, 3], [256, 512, 8], [512, 1024, 36], [1024, 2048, 3]],
+}
+
 
 class ConvBN(nn.Sequential):
 
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1):
         layers = [
-            nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding, bias=False),
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
         ]
         super(ConvBN, self).__init__(*layers)
 
+
 class ResidualBlock(nn.Module):
-    
+
     def __init__(self, in_channels, out_channels, stride=1):
         super(ResidualBlock, self).__init__()
         self.CB1 = ConvBN(in_channels, out_channels, stride=stride)
         self.CB2 = ConvBN(out_channels, out_channels)
         if in_channels != out_channels:
-            self.shortcut = ConvBN(in_channels, out_channels, kernel_size=1, stride=stride, padding=0)
+            self.shortcut = ConvBN(
+                in_channels, out_channels, kernel_size=1, stride=stride, padding=0
+            )
         else:
             self.shortcut = None
-        
+
     def forward(self, x):
         out = self.CB1(x)
         out = F.relu(out)
@@ -40,6 +52,7 @@ class ResidualBlock(nn.Module):
         out = F.relu(out)
 
         return out
+
 
 class BottleneckBlock(nn.Module):
 
@@ -53,7 +66,9 @@ class BottleneckBlock(nn.Module):
 
         self.shortcut = nn.Identity()
         if stride != 1 or in_channels != out_channels:
-            self.shortcut = ConvBN(in_channels, out_channels, kernel_size=1, stride=stride, padding=0)
+            self.shortcut = ConvBN(
+                in_channels, out_channels, kernel_size=1, stride=stride, padding=0
+            )
 
         self.relu = nn.ReLU(inplace=True)
 
@@ -69,9 +84,8 @@ class BottleneckBlock(nn.Module):
         out += identity
         out = self.relu(out)
         return out
-    
-        
-        
+
+
 @mlconfig.register
 class ResNet(nn.Module):
 
@@ -82,23 +96,30 @@ class ResNet(nn.Module):
             nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
         )
-        
+
         if arch in [18, 34]:
             self.block = ResidualBlock
         else:
             self.block = BottleneckBlock
-        
-        self.stage1 = self._make_layer(arch_list[0][0], arch_list[0][1], arch_list[0][2], stage1=True)
-        self.stage2 = self._make_layer(arch_list[1][0], arch_list[1][1], arch_list[1][2])
-        self.stage3 = self._make_layer(arch_list[2][0], arch_list[2][1], arch_list[2][2])
-        self.stage4 = self._make_layer(arch_list[3][0], arch_list[3][1], arch_list[3][2])
+
+        self.stage1 = self._make_layer(
+            arch_list[0][0], arch_list[0][1], arch_list[0][2], stage1=True
+        )
+        self.stage2 = self._make_layer(
+            arch_list[1][0], arch_list[1][1], arch_list[1][2]
+        )
+        self.stage3 = self._make_layer(
+            arch_list[2][0], arch_list[2][1], arch_list[2][2]
+        )
+        self.stage4 = self._make_layer(
+            arch_list[3][0], arch_list[3][1], arch_list[3][2]
+        )
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
-        
+
         self.classifier = nn.Sequential(
-            nn.Linear(arch_list[3][1], num_classes),
-            nn.Softmax(dim=1)
+            nn.Linear(arch_list[3][1], num_classes), nn.Softmax(dim=1)
         )
 
         self._initialize_weights()
@@ -113,7 +134,7 @@ class ResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
         return x
-    
+
     def _make_layer(self, in_channels, out_channels, block_num, stage1=False):
         layers = []
         for b in range(block_num):
@@ -124,7 +145,7 @@ class ResNet(nn.Module):
             in_channels = out_channels
 
         return nn.Sequential(*layers)
-    
+
     def _initialize_weights(self):
         # weight initialization
         for m in self.modules():

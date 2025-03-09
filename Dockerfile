@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libtinfo-dev zlib1g-dev libedit-dev libxml2-dev \
     gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
     binutils-aarch64-linux-gnu \
-    git vim cmake && rm -rf /var/lib/apt/lists/*
+    git vim cmake openssh-client \
+    && rm -rf /var/lib/apt/lists/* 
 
 
 # Upgrade CMake to version 3.22.2 (if default is outdated)
@@ -68,6 +69,10 @@ RUN make runtime -j$(nproc) || (cat CMakeFiles/CMakeError.log && false)
 ENV TVM_HOME=/tvm
 ENV PYTHONPATH=PYTHONPATH=$TVM_HOME/python
 ENV LD_LIBRARY_PATH=$TVM_HOME/build:$LD_LIBRARY_PATH
+
+
+RUN pip --version
+RUN pip3 --version
 
 # Install Python dependencies
 RUN pip3 --no-cache-dir install \
