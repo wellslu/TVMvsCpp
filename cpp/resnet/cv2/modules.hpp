@@ -92,6 +92,8 @@ public:
     ResidualBlock(string name, int in_channels, int out_channels, int stride = 1);
     void load_weights(const cnpy::npz_t &npz_data);
     cv::Mat forward(const cv::Mat &input);
+    ResidualBlock(ResidualBlock &&other) noexcept;
+    ~ResidualBlock();
 
 private:
     string name;
@@ -99,17 +101,34 @@ private:
     ConvBN *shortcut;
 };
 
+class BottleneckBlock
+{
+public:
+    BottleneckBlock();
+    BottleneckBlock(string name, int in_channels, int out_channels, int stride = 1);
+    BottleneckBlock(BottleneckBlock &&other) noexcept;
+    void load_weights(const cnpy::npz_t &npz_data);
+    cv::Mat forward(const cv::Mat &input);
+    ~BottleneckBlock();
+
+private:
+    string name;
+    ConvBN cb1, cb2, cb3;
+    ConvBN *shortcut;
+};
+
 class ResidualStage
 {
 public:
     ResidualStage();
-    ResidualStage(string name, int in_channels, int out_channels, int block_num, bool stage1 = false);
+    ResidualStage(string name, int in_channels, int out_channels, int block_num, bool stage1 = false, bool use_bottleneck = false);
     void load_weights(const cnpy::npz_t &npz_data);
     cv::Mat forward(const cv::Mat &input);
 
 private:
     string name;
     vector<ResidualBlock> layers;
+    vector<BottleneckBlock> bottleneck_layers;
 };
 
 class FullyConnectedLayer

@@ -9,7 +9,7 @@ BatchNormLayer::BatchNormLayer(string name, int channels) : name(name), channels
 void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
 {
     string key_name = name + ".weight";
-    auto it = npz_data.find(key_name);
+    static auto it = npz_data.find(key_name);
     if (it != npz_data.end())
     {
         this->gamma = cv::Mat(channels, 1, CV_32F);
@@ -59,6 +59,8 @@ void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
     {
         cout << "Failed to load " << key_name << endl;
     }
+
+    it = cnpy::npz_t::const_iterator();
 }
 
 cv::Mat BatchNormLayer::forward(const cv::Mat &input)

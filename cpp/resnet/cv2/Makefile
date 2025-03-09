@@ -2,7 +2,7 @@ CC = g++
 
 CFLAGS = -std=c++11 -O3 -o
 
-OUTPUT = resnet_34
+OUTPUT = resnet
 # OUTPUT = test
 
 PKG_CONFIG = pkg-config

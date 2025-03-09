@@ -37,7 +37,7 @@ cv::Mat flattenChannelsToLongVector(const cv::Mat &input)
 ResNet::ResNet(string name, int arch, int num_classes)
     : name(name), arch(arch), num_classes(num_classes), conv1("conv1.0", 1, 64, 7, 2, 3, false), bn1("conv1.1", 64), relu(), max_pool1(3, 2, 1)
 {
-    assert(arch == 18 || arch == 34);
+    assert(arch == 18 || arch == 34 || arch == 50 || arch == 101 || arch == 152);
     std::cout << "ResNet-" << arch << " architecture:\n";
 
     // 确保 archs 里包含 key
@@ -48,10 +48,12 @@ ResNet::ResNet(string name, int arch, int num_classes)
     }
     auto layer_size_list = it->second;
 
-    this->stage1 = ResidualStage("stage1", layer_size_list[0][0], layer_size_list[0][1], layer_size_list[0][2], true);
-    this->stage2 = ResidualStage("stage2", layer_size_list[1][0], layer_size_list[1][1], layer_size_list[1][2]);
-    this->stage3 = ResidualStage("stage3", layer_size_list[2][0], layer_size_list[2][1], layer_size_list[2][2]);
-    this->stage4 = ResidualStage("stage4", layer_size_list[3][0], layer_size_list[3][1], layer_size_list[3][2]);
+    bool use_bottleneck = (arch == 50 || arch == 101 || arch == 152);
+
+    this->stage1 = ResidualStage("stage1", layer_size_list[0][0], layer_size_list[0][1], layer_size_list[0][2], true, use_bottleneck);
+    this->stage2 = ResidualStage("stage2", layer_size_list[1][0], layer_size_list[1][1], layer_size_list[1][2], false, use_bottleneck);
+    this->stage3 = ResidualStage("stage3", layer_size_list[2][0], layer_size_list[2][1], layer_size_list[2][2], false, use_bottleneck);
+    this->stage4 = ResidualStage("stage4", layer_size_list[3][0], layer_size_list[3][1], layer_size_list[3][2], false, use_bottleneck);
 
     this->adap_pool = AdaptiveAvgPool2DLayer(1, 1);
 
@@ -65,18 +67,29 @@ ResNet::ResNet(string name, int arch, int num_classes)
 
 cv::Mat ResNet::forward(const cv::Mat &input)
 {
+
     cv::Mat output;
+    cout << "start conv1.forward\n ";
     output = this->conv1.forward(input);
+    cout << "start bn1.forward\n ";
     output = this->bn1.forward(output);
+    cout << "start relu.forward\n ";
     output = this->relu.forward(output);
+    cout << "start max_pool1.forward\n ";
     output = this->max_pool1.forward(output);
+    cout << "start stage1.forward\n ";
     output = this->stage1.forward(output);
+    cout << "start stage2.forward\n ";
     output = this->stage2.forward(output);
+    cout << "start stage3.forward\n ";
     output = this->stage3.forward(output);
+    cout << "start stage4.forward\n ";
     output = this->stage4.forward(output);
+    cout << "start adap_pool.forward\n ";
     output = this->adap_pool.forward(output);
 
     output = flattenChannelsToLongVector(output);
+    cout << "start fc.forward\n ";
     output = this->fc.forward(output);
     output = this->softmax.forward(output);
     return output;
@@ -85,6 +98,16 @@ cv::Mat ResNet::forward(const cv::Mat &input)
 void ResNet::load_weights(const std::string &weight_file)
 {
     cnpy::npz_t npz_data = cnpy::npz_load(weight_file);
+    // cnpy::npz_t *npz_data = new cnpy::npz_t(cnpy::npz_load(weight_file));
+
+    // size_t total_size = 0;
+    // for (const auto &pair : npz_data)
+    // {
+    //     size_t array_size = pair.second.num_bytes(); // 获取该数组的字节数
+    //     total_size += array_size;
+    //     std::cout << "Key: " << pair.first << ", Size: " << array_size / (1024.0 * 1024.0) << " MB" << std::endl;
+    // }
+    // std::cout << "Total npz_data size: " << total_size / (1024.0 * 1024.0) << " MB" << std::endl;
     this->conv1.load_weights(npz_data);
     this->bn1.load_weights(npz_data);
     this->stage1.load_weights(npz_data);
