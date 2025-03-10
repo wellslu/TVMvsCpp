@@ -4,7 +4,7 @@
 #include "resnet.hpp"
 using namespace std;
 
-const string WEIGHTS_FOLDER = "../../../data/MNIST/";
+const string WEIGHTS_FOLDER = "/mnt/";
 
 vector<cv::Mat> get_input(string image_path)
 {
@@ -30,14 +30,14 @@ vector<cv::Mat> get_input(string image_path)
 void test_resnet(int arch)
 {
     string arch_str = to_string(arch);
-    int repeat_times = 2;
+    int repeat_times = 5;
 
     std::string imagePath = "../../../3.png";
     vector<cv::Mat> input = get_input(imagePath);
 
     cout << "------------------------------------------------------------------------------\n";
     ResNet resnet = ResNet("ResNet-" + arch_str, arch, 10);
-    resnet.load_weights(WEIGHTS_FOLDER + "resnet" + arch_str + ".npz");
+    resnet.load_weights(WEIGHTS_FOLDER + "ResNet" + arch_str + ".npz");
 
     for (int idx = 0; idx < repeat_times; idx++)
     {
