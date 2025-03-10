@@ -2,7 +2,7 @@
 
 We explore two different approaches for implementing ResNet models loading and inference in C++:
 
-- Pure C++ Implementation with Some Performance Optimizations
+- Pure C++ Implementation with Some Performance Optimizations.
   - Strengths: 
     - **1)** Fewer dependencies.
     - **2)** More platform compatibility.
