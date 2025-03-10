@@ -1,23 +1,17 @@
-# C++ Model Code
+# C++ Implementation
 
-## Target
-### pure CPP implementation (WIP)  
-  - Strengths:
-    - less dependancy
-    - compatible with more platforms
-  - Weakness:
-    - computation inefficiency
-      - **malloc**: can't align the allocated the data automatically with 64 bytes (compatible with SIMD instructions -> better performance)
-### TorchLib implementation (Pending)
-### OpenBlas implementation (Pending)
-### MKL (won't implement as only supported on Intel CPUs)
+We explore two different approaches for implementing ResNet models loading and inference in C++:
 
-
-## Step
-- [ ] 🎯 Develop different version of ResNet and MobileNet models using C++
-  - [ ] ⏳ **(WIP)** ResNet-18/34/50
-  - [ ] MobileNet(v1\~v3)
-- [ ] 🛠️ Load weights of models trained using PyTorch
-- [ ] 🏗️ Deploy models and weights to **raspberry pi**
-- [ ] 📊 Compare the efficiency and accuracy of models with TVM
-  
+- Pure C++ Implementation with Some Performance Optimizations
+  - Strengths: 
+    - **1)** Fewer dependencies.
+    - **2)** More platform compatibility.
+  - Weakness:  
+    - **1)** dDevelopment is more challenging due to the lack of convenient data structures (e.g., tensors) and operations (e.g., convolution, pooling). 
+    - **2)** cComputational inefficiency, despite C++ being a relatively fast programming language itself. Achieving optimal performance requires substantial fine-grained optimization.
+- LibTorch implementation.
+  - Strengths: 
+    - **1)** Easier development, with a rich set of data structures and functions.
+    - **2)** High efficiency, benefiting from extensive underlying optimizations.
+  - Weakness:  
+    - **1)** Setting up the compilation environment can be tricky on specific machines (e.g., on a Mac with an M1 chip).
