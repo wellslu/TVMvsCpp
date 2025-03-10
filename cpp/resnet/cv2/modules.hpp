@@ -17,7 +17,7 @@ class Conv2DLayer
 public:
     Conv2DLayer(string name, int in_channels, int out_channels, int kernel_size, int stride = 1, int padding = 0, bool bias = true);
     void load_weights(const cnpy::npz_t &npz_data);
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 
 private:
     string name;
@@ -31,7 +31,7 @@ class BatchNormLayer
 public:
     BatchNormLayer(string name, int channels);
     void load_weights(const cnpy::npz_t &npz_data);
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 
 private:
     string name;
@@ -46,7 +46,7 @@ public:
     ConvBN(string name, int in_channels, int out_channels, int kernel_size = 3, int stride = 1, int padding = 1);
     void load_weights(const cnpy::npz_t &npz_data);
 
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 
 private:
     string name;
@@ -57,7 +57,7 @@ private:
 class ReLU
 {
 public:
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 };
 
 class MaxPool2DLayer
@@ -65,7 +65,7 @@ class MaxPool2DLayer
 public:
     MaxPool2DLayer(int pool_size, int stride, int padding = 0);
 
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 
 private:
     int pool_size; // 池化窗口大小
@@ -79,7 +79,7 @@ public:
     AdaptiveAvgPool2DLayer();
     AdaptiveAvgPool2DLayer(int output_height, int output_width);
 
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 
 private:
     int output_height; // 输出图像的高度
@@ -91,7 +91,9 @@ class ResidualBlock
 public:
     ResidualBlock(string name, int in_channels, int out_channels, int stride = 1);
     void load_weights(const cnpy::npz_t &npz_data);
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
+    ResidualBlock(ResidualBlock &&other) noexcept;
+    ~ResidualBlock();
 
 private:
     string name;
@@ -99,17 +101,34 @@ private:
     ConvBN *shortcut;
 };
 
+class BottleneckBlock
+{
+public:
+    BottleneckBlock();
+    BottleneckBlock(string name, int in_channels, int out_channels, int stride = 1);
+    BottleneckBlock(BottleneckBlock &&other) noexcept;
+    void load_weights(const cnpy::npz_t &npz_data);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
+    ~BottleneckBlock();
+
+private:
+    string name;
+    ConvBN cb1, cb2, cb3;
+    ConvBN *shortcut;
+};
+
 class ResidualStage
 {
 public:
     ResidualStage();
-    ResidualStage(string name, int in_channels, int out_channels, int block_num, bool stage1 = false);
+    ResidualStage(string name, int in_channels, int out_channels, int block_num, bool stage1 = false, bool use_bottleneck = false);
     void load_weights(const cnpy::npz_t &npz_data);
-    cv::Mat forward(const cv::Mat &input);
+    vector<cv::Mat> forward(const vector<cv::Mat> &input);
 
 private:
     string name;
     vector<ResidualBlock> layers;
+    vector<BottleneckBlock> bottleneck_layers;
 };
 
 class FullyConnectedLayer

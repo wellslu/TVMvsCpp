@@ -9,12 +9,13 @@ FullyConnectedLayer::FullyConnectedLayer(string name, int in_features, int out_f
 void FullyConnectedLayer::load_weights(const cnpy::npz_t &npz_data)
 {
     string key_name = name + ".weight";
-    auto it = npz_data.find(key_name);
+    static typename cnpy::npz_t::const_iterator it = npz_data.end(); // 初始化一次
+    it = npz_data.find(key_name);
     if (it != npz_data.end())
     {
         this->weights = cv::Mat(out_features, in_features, CV_32F);
         memcpy(this->weights.data, (it->second).data<float>(), sizeof(float) * (this->weights.size().height) * (this->weights.size().width));
-        cout << "successfully load " << "\"" << key_name << "\": \"" << this->weights.size() << "\"" << endl;
+        // cout << "successfully load " << "\"" << key_name << "\": \"" << this->weights.size() << "\"" << endl;
     }
     else
     {
@@ -27,12 +28,13 @@ void FullyConnectedLayer::load_weights(const cnpy::npz_t &npz_data)
     {
         this->bias = cv::Mat(out_features, 1, CV_32F);
         memcpy(this->bias.data, (it->second).data<float>(), sizeof(float) * (this->bias.size().height) * (this->bias.size().width));
-        cout << "successfully load " << "\"" << key_name << "\": \"" << this->bias.size() << "\"" << endl;
+        // cout << "successfully load " << "\"" << key_name << "\": \"" << this->bias.size() << "\"" << endl;
     }
     else
     {
         cout << "Failed to load " << key_name << endl;
     }
+    it = cnpy::npz_t::const_iterator();
 }
 
 cv::Mat FullyConnectedLayer::forward(const cv::Mat &input)
