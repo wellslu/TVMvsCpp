@@ -32,7 +32,7 @@ while true; do
         echo "$TIMESTAMP,$pid,$MEM_USAGE,$RSS" >> "$LOGFILE2"
     done
 
-    # 追蹤所有符合第二個 pattern 的 PID
+    # 追蹤所有符合第三個 pattern 的 PID
     PIDS3=($(pgrep -f "$PATTERN3"))
     for pid in "${PIDS3[@]}"; do
         MEM_USAGE=$(ps -p "$pid" -o %mem=)
