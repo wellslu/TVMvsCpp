@@ -57,9 +57,9 @@ void ResidualStage::load_weights(const cnpy::npz_t &npz_data)
     return;
 }
 
-cv::Mat ResidualStage::forward(const cv::Mat &input)
+vector<cv::Mat> ResidualStage::forward(const vector<cv::Mat> &input)
 {
-    cv::Mat output = input;
+    vector<cv::Mat> output = input;
     if (!layers.empty())
     {
         for (auto &layer : layers)
@@ -117,10 +117,15 @@ void ResidualBlock::load_weights(const cnpy::npz_t &npz_data)
     }
 };
 
-cv::Mat ResidualBlock::forward(const cv::Mat &input)
+vector<cv::Mat> ResidualBlock::forward(const vector<cv::Mat> &input)
 {
-    cv::Mat output = input;
-    cv::Mat identity = input;
+    vector<cv::Mat> output;
+    vector<cv::Mat> identity;
+    for (const auto &mat : input)
+    {
+        output.push_back(mat.clone());   // 深拷贝
+        identity.push_back(mat.clone()); // 深拷贝
+    }
 
     ReLU relu;
 
@@ -133,7 +138,11 @@ cv::Mat ResidualBlock::forward(const cv::Mat &input)
         identity = this->shortcut->forward(identity);
     }
 
-    output += identity;
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        output[i] += identity[i]; // 逐元素相加
+    }
+
     output = relu.forward(output);
 
     return output;
@@ -176,12 +185,16 @@ void BottleneckBlock::load_weights(const cnpy::npz_t &npz_data)
     return;
 }
 
-cv::Mat BottleneckBlock::forward(const cv::Mat &input)
+vector<cv::Mat> BottleneckBlock::forward(const vector<cv::Mat> &input)
 {
     ReLU relu;
-    cv::Mat identity = input;
+    vector<cv::Mat> identity;
+    for (const auto &mat : input)
+    {
+        identity.push_back(mat.clone()); // 深拷贝
+    }
     cout << "cb1 forwarding\n";
-    cv::Mat output = this->cb1.forward(input);
+    vector<cv::Mat> output = this->cb1.forward(input);
     cout << "relu forwarding\n";
     output = relu.forward(output);
     cout << "cb2 forwarding\n";
@@ -195,7 +208,10 @@ cv::Mat BottleneckBlock::forward(const cv::Mat &input)
         cout << "shortcut forwarding\n";
         identity = this->shortcut->forward(identity);
     }
-    output += identity;
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        output[i] += identity[i];
+    }
     cout << "relu forwarding\n";
     output = relu.forward(output);
     return output;

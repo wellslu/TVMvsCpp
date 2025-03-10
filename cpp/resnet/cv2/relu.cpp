@@ -1,12 +1,13 @@
 #include "modules.hpp"
 
-cv::Mat ReLU::forward(const cv::Mat &input)
+vector<cv::Mat> ReLU::forward(const vector<cv::Mat> &input)
 {
-    // Create an output matrix with the same size and type as input
-    cv::Mat output = input.clone(); // Clone input to create a new matrix for output
-
-    // Apply ReLU: Set all negative values to 0
-    cv::max(output, 0, output); // Element-wise max: ReLU(x) = max(0, x)
-
+    vector<cv::Mat> output;
+    for (const auto &mat : input)
+    {
+        cv::Mat relu_mat = mat.clone();
+        cv::max(relu_mat, 0, relu_mat); // 逐个矩阵应用 ReLU
+        output.push_back(relu_mat);
+    }
     return output;
 }

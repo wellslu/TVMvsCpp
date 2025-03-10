@@ -6,19 +6,15 @@
 MaxPool2DLayer::MaxPool2DLayer(int pool_size, int stride, int padding)
     : pool_size(pool_size), stride(stride), padding(padding) {};
 
-cv::Mat MaxPool2DLayer::forward(const cv::Mat &input)
+vector<cv::Mat> MaxPool2DLayer::forward(const vector<cv::Mat> &input)
 {
     // input: (H, W, C)
-    int padded_rows = input.rows + 2 * this->padding;
-    int padded_cols = input.cols + 2 * this->padding;
-
-    // 分离多通道
-    std::vector<cv::Mat> channels;
-    cv::split(input, channels);
+    int padded_rows = input[0].rows + 2 * this->padding;
+    int padded_cols = input[0].cols + 2 * this->padding;
 
     std::vector<cv::Mat> output_channels;
 
-    for (auto &channel : channels)
+    for (auto &channel : input)
     {
         // 进行 padding
         cv::Mat padded_input;
@@ -42,11 +38,7 @@ cv::Mat MaxPool2DLayer::forward(const cv::Mat &input)
         output_channels.push_back(output);
     }
 
-    // 合并通道回去
-    cv::Mat final_output;
-    cv::merge(output_channels, final_output);
-
-    return final_output;
+    return output_channels;
 }
 
 AdaptiveAvgPool2DLayer::AdaptiveAvgPool2DLayer() {};
@@ -54,22 +46,18 @@ AdaptiveAvgPool2DLayer::AdaptiveAvgPool2DLayer() {};
 AdaptiveAvgPool2DLayer::AdaptiveAvgPool2DLayer(int output_height, int output_width)
     : output_height(output_height), output_width(output_width) {}
 
-cv::Mat AdaptiveAvgPool2DLayer::forward(const cv::Mat &input)
+vector<cv::Mat> AdaptiveAvgPool2DLayer::forward(const vector<cv::Mat> &input)
 {
     // input: (H, W, C)
-    int in_height = input.rows;
-    int in_width = input.cols;
+    int in_height = input[0].rows;
+    int in_width = input[0].cols;
 
     int kernel_height = in_height / this->output_height;
     int kernel_width = in_width / this->output_width;
 
-    // 分离多通道
-    std::vector<cv::Mat> channels;
-    cv::split(input, channels);
-
     std::vector<cv::Mat> output_channels;
 
-    for (auto &channel : channels)
+    for (auto &channel : input)
     {
         cv::Mat output(this->output_height, this->output_width, CV_32F, cv::Scalar(0));
 
@@ -94,9 +82,5 @@ cv::Mat AdaptiveAvgPool2DLayer::forward(const cv::Mat &input)
         output_channels.push_back(output);
     }
 
-    // 合并通道
-    cv::Mat final_output;
-    cv::merge(output_channels, final_output);
-
-    return final_output;
+    return output_channels;
 }

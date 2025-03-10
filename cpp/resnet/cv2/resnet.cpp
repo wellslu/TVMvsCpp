@@ -8,22 +8,18 @@
 #include "resnet.hpp"
 using namespace std;
 
-cv::Mat flattenChannelsToLongVector(const cv::Mat &input)
+cv::Mat flattenChannelsToLongVector(const vector<cv::Mat> &input)
 {
     // input: (H, W, C) multi-channel matrix
-
-    // 拆分多通道矩阵
-    std::vector<cv::Mat> channels;
-    cv::split(input, channels); // 将多通道矩阵拆分成单通道矩阵
 
     // 用来存储拼接后的长向量
     std::vector<cv::Mat> flattenedChannels;
 
     // 展平每个通道并加入到 flattenedChannels 中
-    for (size_t i = 0; i < channels.size(); ++i)
+    for (size_t i = 0; i < input.size(); ++i)
     {
         cv::Mat flat;
-        channels[i].reshape(1, 1).copyTo(flat); // 展平通道，变为一个长向量
+        input[i].reshape(1, 1).copyTo(flat); // 展平通道，变为一个长向量
         flattenedChannels.push_back(flat);
     }
 
@@ -65,10 +61,10 @@ ResNet::ResNet(string name, int arch, int num_classes)
     this->fc = FullyConnectedLayer("classifier.0", fc_in_size, num_classes);
 }
 
-cv::Mat ResNet::forward(const cv::Mat &input)
+cv::Mat ResNet::forward(const vector<cv::Mat> &input)
 {
 
-    cv::Mat output;
+    vector<cv::Mat> output;
     cout << "start conv1.forward\n ";
     output = this->conv1.forward(input);
     cout << "start bn1.forward\n ";
@@ -88,11 +84,11 @@ cv::Mat ResNet::forward(const cv::Mat &input)
     cout << "start adap_pool.forward\n ";
     output = this->adap_pool.forward(output);
 
-    output = flattenChannelsToLongVector(output);
+    auto flatten_output = flattenChannelsToLongVector(output);
     cout << "start fc.forward\n ";
-    output = this->fc.forward(output);
-    output = this->softmax.forward(output);
-    return output;
+    flatten_output = this->fc.forward(flatten_output);
+    flatten_output = this->softmax.forward(flatten_output);
+    return flatten_output;
 }
 
 void ResNet::load_weights(const std::string &weight_file)

@@ -63,26 +63,20 @@ void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
     it = cnpy::npz_t::const_iterator();
 }
 
-cv::Mat BatchNormLayer::forward(const cv::Mat &input)
+vector<cv::Mat> BatchNormLayer::forward(const vector<cv::Mat> &input)
 {
     // 获取输入尺寸
     const float epsilon = 1e-5;
-    int height = input.rows;
-    int width = input.cols;
-    int channels = input.channels(); // 获取通道数
-
-    cv::Mat output(input.size(), input.type()); // 结果矩阵
-
-    // 拆分通道
-    std::vector<cv::Mat> inputChannels;
-    cv::split(input, inputChannels);
+    // int height = input[0].rows;
+    // int width = input[0].cols;
+    int channels = input.size(); // 获取通道数
 
     std::vector<cv::Mat> outputChannels(channels);
 
     // 逐通道归一化
     for (int c = 0; c < channels; ++c)
     {
-        cv::Mat x = inputChannels[c];
+        cv::Mat x = input[c];
 
         // BN 归一化
         cv::Mat x_hat = (x - running_mean.at<float>(c)) / std::sqrt(running_var.at<float>(c) + epsilon);
@@ -91,8 +85,5 @@ cv::Mat BatchNormLayer::forward(const cv::Mat &input)
         outputChannels[c] = x_hat * gamma.at<float>(c) + beta.at<float>(c);
     }
 
-    // 合并通道
-    cv::merge(outputChannels, output);
-
-    return output;
+    return outputChannels;
 }

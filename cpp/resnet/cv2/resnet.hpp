@@ -23,7 +23,7 @@ class ResNet
 public:
     ResNet(string name, int arch, int num_classes);
     void load_weights(const std::string &weight_file);
-    cv::Mat forward(const cv::Mat &input);
+    cv::Mat forward(const vector<cv::Mat> &input);
 
 private:
     string name;

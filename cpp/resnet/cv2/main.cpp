@@ -6,7 +6,7 @@ using namespace std;
 
 const string WEIGHTS_FOLDER = "../../../data/MNIST/";
 
-cv::Mat get_input(string image_path)
+vector<cv::Mat> get_input(string image_path)
 {
     cv::Mat raw_image = cv::imread(image_path, cv::IMREAD_GRAYSCALE); // 可以指定读取方式，如彩色（IMREAD_COLOR）或灰度（IMREAD_GRAYSCALE）
     cv::Mat resizedImage;
@@ -21,7 +21,9 @@ cv::Mat get_input(string image_path)
     float std = 0.3081f;
 
     // 将每个像素值减去均值并除以标准差
-    cv::Mat input = (floatImage - mean) / std;
+    cv::Mat one_channel_image = (floatImage - mean) / std;
+    vector<cv::Mat> input;
+    input.push_back(one_channel_image);
     return input;
 }
 
@@ -105,7 +107,7 @@ void test_resnet(int arch)
     int repeat_times = 2;
 
     std::string imagePath = "../../../3.png";
-    cv::Mat input = get_input(imagePath);
+    vector<cv::Mat> input = get_input(imagePath);
 
     cout << "------------------------------------------------------------------------------\n";
     ResNet resnet = ResNet("ResNet-" + arch_str, arch, 10);
@@ -144,8 +146,8 @@ void test_resnet(int arch)
 int main()
 {
     // test_resnet(18);
-    // test_resnet(34);
-    test_resnet(50);
+    test_resnet(34);
+    // test_resnet(50);
     // test_resnet(101);
     // test_resnet(152);
 

@@ -37,51 +37,146 @@ void Conv2DLayer::load_weights(const cnpy::npz_t &npz_data)
     it = cnpy::npz_t::const_iterator();
 }
 
-cv::Mat Conv2DLayer::forward(const cv::Mat &input)
+vector<cv::Mat> Conv2DLayer::forward(const vector<cv::Mat> &input)
 {
-    int in_height = input.rows, in_width = input.cols;
-    assert(in_channels == input.channels());
+    // input (H, W, C)
+    int in_height = input[0].rows;
+    int in_width = input[0].cols;
+    assert(in_channels == input.size());
 
+    // **计算输出尺寸（考虑 Padding 和 Stride）**
     int out_height = (in_height + 2 * padding - kernel_size) / stride + 1;
     int out_width = (in_width + 2 * padding - kernel_size) / stride + 1;
 
-    cv::Mat paddedInput;
-    cv::copyMakeBorder(input, paddedInput, padding, padding, padding, padding, cv::BORDER_CONSTANT, 0);
+    // **初始化输出张量**
+    cv::Mat output(out_height, out_width, CV_32FC(out_channels), cv::Scalar(0));
 
+    // 将输入分为不同的通道
     std::vector<cv::Mat> inputChannels;
-    cv::split(paddedInput, inputChannels);
+    for (auto &a : input)
+    {
+        cv::Mat paddedInput;
+        cv::copyMakeBorder(a, paddedInput, padding, padding, padding, padding, cv::BORDER_CONSTANT, 0);
+        inputChannels.push_back(paddedInput.clone());
+    }
 
-    std::vector<cv::Mat> outputChannels(out_channels);
-    for (int o = 0; o < out_channels; ++o)
-        outputChannels[o] = cv::Mat(out_height, out_width, CV_32F, cv::Scalar(0));
+    cv::Mat &kernels = this->weights; // kernels (out_channels, in_channels * kernel_size * kernel_size)
 
-    cv::Mat &kernels = this->weights;
+    // **执行卷积**
     for (int o = 0; o < out_channels; ++o)
     {
+        cv::Mat outFeatureMap(out_height, out_width, CV_32F, cv::Scalar(0)); // 当前输出通道的特征图
+
         for (int i = 0; i < in_channels; ++i)
         {
-            float *kernel_ptr = kernels.ptr<float>(o) + i * kernel_size * kernel_size;
-            cv::Mat kernel(kernel_size, kernel_size, CV_32F, kernel_ptr);
+            // **提取卷积核**
+            cv::Mat kernel(kernel_size, kernel_size, CV_32F, (void *)kernels.ptr<float>(o, i * kernel_size * kernel_size));
 
-            cv::Mat filtered;
-            cv::filter2D(inputChannels[i], filtered, -1, kernel, cv::Point(-1, -1), 0, cv::BORDER_CONSTANT);
-
-            // **手动进行 stride 采样**
+            // **对单个输入通道应用卷积，考虑Stride**
             for (int h = 0; h < out_height; ++h)
             {
                 for (int w = 0; w < out_width; ++w)
                 {
-                    outputChannels[o].at<float>(h, w) = filtered.at<float>(h * stride, w * stride);
+                    // 计算卷积窗口的起始位置
+                    int startY = h * stride;
+                    int startX = w * stride;
+
+                    // 提取区域
+                    cv::Rect roi(startX, startY, kernel_size, kernel_size);
+                    cv::Mat region = inputChannels[i](roi);
+
+                    // 进行卷积（内积）
+                    double sum = cv::sum(region.mul(kernel))[0];
+                    outFeatureMap.at<float>(h, w) += static_cast<float>(sum);
                 }
             }
         }
 
+        // **添加 Bias**
         if (this->bias)
-            outputChannels[o] += biases.at<float>(o, 0);
+        {
+            outFeatureMap += biases.at<float>(o, 0);
+        }
+
+        // **将当前通道的结果存入输出矩阵**
+        std::vector<cv::Mat> outputChannels;
+        cv::split(output, outputChannels);
+        outputChannels[o] = outFeatureMap; // 将当前输出特征图放入对应的输出通道
+        cv::merge(outputChannels, output); // 合并所有输出通道
     }
 
-    cv::Mat output;
-    cout << outputChannels.size() << endl;
-    cv::merge(outputChannels, output);
-    return output;
+    vector<cv::Mat> res;
+    cv::split(output, res);
+    return res;
 }
+// {
+//     // input (H, W, C)
+//     int in_height = input[0].rows;
+//     int in_width = input[0].cols;
+//     assert(in_channels == input.size());
+
+//     // **计算输出尺寸**
+//     int out_height = (in_height + 2 * padding - kernel_size) / stride + 1;
+//     int out_width = (in_width + 2 * padding - kernel_size) / stride + 1;
+
+//     // **初始化输出通道**
+//     std::vector<cv::Mat> outputChannels(out_channels);
+//     for (int o = 0; o < out_channels; ++o)
+//     {
+//         outputChannels[o] = cv::Mat(out_height, out_width, CV_32F, cv::Scalar(0));
+//     }
+
+//     // **输入 Padding**
+//     std::vector<cv::Mat> inputChannels;
+//     for (auto &a : input)
+//     {
+//         cv::Mat paddedInput;
+//         cv::copyMakeBorder(a, paddedInput, padding, padding, padding, padding, cv::BORDER_CONSTANT, 0);
+//         inputChannels.push_back(paddedInput.clone());
+//     }
+
+//     int padded_cols = inputChannels[0].cols, padded_rows = inputChannels[0].rows;
+
+//     // **执行卷积**
+//     cv::Mat &kernels = this->weights; // (out_channels, in_channels * kernel_size * kernel_size)
+
+//     for (int o = 0; o < out_channels; ++o)
+//     {
+//         for (int i = 0; i < in_channels; ++i)
+//         {
+//             float *kernel_ptr = kernels.ptr<float>(o) + i * kernel_size * kernel_size;
+//             cv::Mat kernel(kernel_size, kernel_size, CV_32F, kernel_ptr);
+
+//             // **对单个输入通道应用卷积**
+//             for (int h = 0; h < out_height; ++h)
+//             {
+//                 for (int w = 0; w < out_width; ++w)
+//                 {
+//                     int startY = h * stride;
+//                     int startX = w * stride;
+
+//                     // **边界检查**
+//                     if (startX + kernel_size > padded_cols || startY + kernel_size > padded_rows)
+//                     {
+//                         cerr << "ROI out of bounds at (h=" << h << ", w=" << w << ")" << endl;
+//                         continue;
+//                     }
+
+//                     // **提取区域**
+//                     cv::Rect roi(startX, startY, kernel_size, kernel_size);
+//                     cv::Mat region = inputChannels[i](roi);
+
+//                     // **卷积计算**
+//                     double sum = cv::sum(region.mul(kernel))[0];
+//                     outputChannels[o].at<float>(h, w) += static_cast<float>(sum);
+//                 }
+//             }
+//         }
+
+//         // **添加 Bias**
+//         if (this->bias)
+//             outputChannels[o] += biases.at<float>(o, 0);
+//     }
+
+//     return outputChannels;
+// }
