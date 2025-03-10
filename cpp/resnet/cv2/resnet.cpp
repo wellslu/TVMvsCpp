@@ -53,39 +53,24 @@ ResNet::ResNet(string name, int arch, int num_classes)
 
     this->adap_pool = AdaptiveAvgPool2DLayer(1, 1);
 
-    int fc_in_size = layer_size_list[3][1];
-    if (!(arch == 18 || arch == 34))
-    {
-        fc_in_size *= 4;
-    }
-    this->fc = FullyConnectedLayer("classifier.0", fc_in_size, num_classes);
+    this->fc = FullyConnectedLayer("classifier.0", layer_size_list[3][1], num_classes);
 }
 
 cv::Mat ResNet::forward(const vector<cv::Mat> &input)
 {
 
     vector<cv::Mat> output;
-    cout << "start conv1.forward\n ";
     output = this->conv1.forward(input);
-    cout << "start bn1.forward\n ";
     output = this->bn1.forward(output);
-    cout << "start relu.forward\n ";
     output = this->relu.forward(output);
-    cout << "start max_pool1.forward\n ";
     output = this->max_pool1.forward(output);
-    cout << "start stage1.forward\n ";
     output = this->stage1.forward(output);
-    cout << "start stage2.forward\n ";
     output = this->stage2.forward(output);
-    cout << "start stage3.forward\n ";
     output = this->stage3.forward(output);
-    cout << "start stage4.forward\n ";
     output = this->stage4.forward(output);
-    cout << "start adap_pool.forward\n ";
     output = this->adap_pool.forward(output);
 
     auto flatten_output = flattenChannelsToLongVector(output);
-    cout << "start fc.forward\n ";
     flatten_output = this->fc.forward(flatten_output);
     flatten_output = this->softmax.forward(flatten_output);
     return flatten_output;

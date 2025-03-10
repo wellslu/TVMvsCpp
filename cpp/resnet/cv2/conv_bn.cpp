@@ -11,9 +11,7 @@ void ConvBN::load_weights(const cnpy::npz_t &npz_data)
 vector<cv::Mat> ConvBN::forward(const vector<cv::Mat> &input)
 {
     vector<cv::Mat> output = input;
-    cout << "conv forwarding\n";
     output = this->conv.forward(output);
-    cout << "bn forwarding\n";
     output = this->bn.forward(output);
     return output;
 }

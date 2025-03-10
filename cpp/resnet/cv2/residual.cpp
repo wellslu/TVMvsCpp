@@ -73,7 +73,6 @@ vector<cv::Mat> ResidualStage::forward(const vector<cv::Mat> &input)
         int idx = 0;
         for (auto &b_layer : bottleneck_layers)
         {
-            cout << "block-" << idx << " forward\n";
             output = b_layer.forward(output);
             idx += 1;
         }
@@ -174,7 +173,6 @@ BottleneckBlock::~BottleneckBlock()
 
 void BottleneckBlock::load_weights(const cnpy::npz_t &npz_data)
 {
-    cout << "bottle neck name: " << name << endl;
     this->cb1.load_weights(npz_data);
     this->cb2.load_weights(npz_data);
     this->cb3.load_weights(npz_data);
@@ -193,26 +191,19 @@ vector<cv::Mat> BottleneckBlock::forward(const vector<cv::Mat> &input)
     {
         identity.push_back(mat.clone()); // 深拷贝
     }
-    cout << "cb1 forwarding\n";
     vector<cv::Mat> output = this->cb1.forward(input);
-    cout << "relu forwarding\n";
     output = relu.forward(output);
-    cout << "cb2 forwarding\n";
     output = this->cb2.forward(output);
-    cout << "relu forwarding\n";
     output = relu.forward(output);
-    cout << "cb3 forwarding\n";
     output = this->cb3.forward(output);
     if (this->shortcut)
     {
-        cout << "shortcut forwarding\n";
         identity = this->shortcut->forward(identity);
     }
     for (size_t i = 0; i < output.size(); ++i)
     {
         output[i] += identity[i];
     }
-    cout << "relu forwarding\n";
     output = relu.forward(output);
     return output;
 }

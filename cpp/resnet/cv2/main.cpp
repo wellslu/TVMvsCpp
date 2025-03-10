@@ -27,80 +27,6 @@ vector<cv::Mat> get_input(string image_path)
     return input;
 }
 
-// void test_resnet34()
-// {
-//     std::string imagePath = "../../../3.png";
-//     cv::Mat input = get_input(imagePath);
-
-//     ResNet resnet34 = ResNet("ResNet-34", 34, 10);
-//     resnet34.load_weights(WEIGHTS_FOLDER + "resnet34.npz");
-
-//     for (int idx = 0; idx < 10; idx++)
-//     {
-//         auto start = std::chrono::high_resolution_clock::now();
-//         cv::Mat logits = resnet34.forward(input);
-//         auto end = std::chrono::high_resolution_clock::now();
-
-//         int max_idx = 0;
-//         float max_logit = 0;
-//         for (int i = 0; i < logits.cols; ++i)
-//         {
-//             float logit = logits.ptr<float>(0, i)[0]; // 使用ptr来访问每个元素
-//             if (logit > max_logit)
-//             {
-//                 max_logit = logit;
-//                 max_idx = i;
-//             }
-//         }
-//         cout << logits.size() << endl;
-//         cout << logits << endl;
-//         cout << "ResNet-34 Prediction: " << max_idx << endl;
-
-//         std::chrono::duration<double> duration = end - start;
-//         std::cout << "ResNet-34 Inference time: " << duration.count() << " seconds" << std::endl;
-//     }
-//     return;
-// }
-
-// void test_resnet18()
-// {
-//     std::string imagePath = "../../../3.png";
-//     cv::Mat input = get_input(imagePath);
-
-//     ResNet resnet18 = ResNet("ResNet-18", 18, 10);
-//     resnet18.load_weights(WEIGHTS_FOLDER + "resnet18.npz");
-
-//     auto start = std::chrono::high_resolution_clock::now();
-//     cv::Mat logits = resnet18.forward(input);
-//     auto end = std::chrono::high_resolution_clock::now();
-
-//     for (int idx = 0; idx < 10; idx++)
-//     {
-//         auto start = std::chrono::high_resolution_clock::now();
-//         cv::Mat logits = resnet18.forward(input);
-//         auto end = std::chrono::high_resolution_clock::now();
-
-//         int max_idx = 0;
-//         float max_logit = 0;
-//         for (int i = 0; i < logits.cols; ++i)
-//         {
-//             float logit = logits.ptr<float>(0, i)[0]; // 使用ptr来访问每个元素
-//             if (logit > max_logit)
-//             {
-//                 max_logit = logit;
-//                 max_idx = i;
-//             }
-//         }
-//         cout << logits.size() << endl;
-//         cout << logits << endl;
-//         cout << "ResNet-18 Prediction: " << max_idx << endl;
-
-//         std::chrono::duration<double> duration = end - start;
-//         std::cout << "ResNet-18 Inference time: " << duration.count() << " seconds" << std::endl;
-//     }
-//     return;
-// }
-
 void test_resnet(int arch)
 {
     string arch_str = to_string(arch);
@@ -145,11 +71,11 @@ void test_resnet(int arch)
 
 int main()
 {
-    // test_resnet(18);
+    test_resnet(18);
     test_resnet(34);
-    // test_resnet(50);
-    // test_resnet(101);
-    // test_resnet(152);
+    test_resnet(50);
+    test_resnet(101);
+    test_resnet(152);
 
     return 0;
 }

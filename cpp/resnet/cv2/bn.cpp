@@ -9,12 +9,13 @@ BatchNormLayer::BatchNormLayer(string name, int channels) : name(name), channels
 void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
 {
     string key_name = name + ".weight";
-    static auto it = npz_data.find(key_name);
+    static typename cnpy::npz_t::const_iterator it = npz_data.end(); // 初始化一次
+    it = npz_data.find(key_name);
     if (it != npz_data.end())
     {
         this->gamma = cv::Mat(channels, 1, CV_32F);
         memcpy(this->gamma.data, (it->second).data<float>(), sizeof(float) * (this->gamma.size().height) * (this->gamma.size().width));
-        cout << "successfully load " << "\"" << key_name << "\": \"" << this->gamma.size() << "\"" << endl;
+        // cout << "successfully load " << "\"" << key_name << "\": \"" << this->gamma.size() << "\"" << endl;
     }
     else
     {
@@ -27,7 +28,7 @@ void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
     {
         this->beta = cv::Mat(channels, 1, CV_32F);
         memcpy(this->beta.data, (it->second).data<float>(), sizeof(float) * (this->beta.size().height) * (this->beta.size().width));
-        cout << "successfully load " << "\"" << key_name << "\": \"" << this->beta.size() << "\"" << endl;
+        // cout << "successfully load " << "\"" << key_name << "\": \"" << this->beta.size() << "\"" << endl;
     }
     else
     {
@@ -40,7 +41,7 @@ void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
     {
         this->running_mean = cv::Mat(channels, 1, CV_32F);
         memcpy(this->running_mean.data, (it->second).data<float>(), sizeof(float) * (this->running_mean.size().height) * (this->running_mean.size().width));
-        cout << "successfully load " << "\"" << key_name << "\": \"" << this->running_mean.size() << "\"" << endl;
+        // cout << "successfully load " << "\"" << key_name << "\": \"" << this->running_mean.size() << "\"" << endl;
     }
     else
     {
@@ -53,13 +54,12 @@ void BatchNormLayer::load_weights(const cnpy::npz_t &npz_data)
     {
         this->running_var = cv::Mat(channels, 1, CV_32F);
         memcpy(this->running_var.data, (it->second).data<float>(), sizeof(float) * (this->running_var.size().height) * (this->running_var.size().width));
-        cout << "successfully load " << "\"" << key_name << "\": \"" << this->running_var.size() << "\"" << endl;
+        // cout << "successfully load " << "\"" << key_name << "\": \"" << this->running_var.size() << "\"" << endl;
     }
     else
     {
         cout << "Failed to load " << key_name << endl;
     }
-
     it = cnpy::npz_t::const_iterator();
 }
 
