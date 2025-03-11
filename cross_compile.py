@@ -23,6 +23,8 @@ def decode_model_name(model_name: str) -> torch.nn.Module:
         return models.ResNet(50, 10), model_path
     elif model_name == "ResNet101":
         return models.ResNet(101, 10), model_path
+    elif model_name == "ResNet152":
+        return models.ResNet(152, 10), model_path
     elif model_name == "MobileNet":
         return models.MobileNet(10), model_path
     elif model_name == "MobileNetV2":

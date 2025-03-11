@@ -36,6 +36,12 @@ def decode_model_name(model_name):
         return models.ResNet(152, 10), model_path
     elif model_name == "MobileNet":
         return models.MobileNet(10), model_path
+    elif model_name == "MobileNetV2":
+        return models.MobileNetV2(10), model_path
+    elif model_name == "MobileNetV3":
+        return models.MobileNetV3(10), model_path
+    elif model_name == "MobileNetV3-large":
+        return models.MobileNetV3(num_classes=10, size="large"), model_path
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
@@ -57,17 +63,19 @@ def main():
             transforms.Normalize((0.1307,), (0.3081,))
         ])
     
-    # start = time.time()
-    log(f"Start inference 1000 times with {args.model}: {time.time()}", args.model)
+    img = Image.open(args.image)
+    data = transform(img)
+    
+    start = time.time()
+    log(f"Start inference 1000 times with {args.model}: {start}", args.model)
 
-    for i in range(1):
-        img = Image.open(args.image)
-        data = transform(img)
+    for i in range(1000):
         input_data = data.reshape(1, 1, 28, 28)
         output = model(input_data)
 
-    log(f"End inference 1000 times with {args.model}: {time.time()}", args.model)
-    # print(f"Inference 1000 times with reload the same image: {time.time() - start}")
+    end = time.time()
+    log(f"End inference 1000 times with {args.model}: {end}", args.model)
+    print(f"Inference 1000 times with reload the same image: {(end - start) / 1000}")
 
     print("Done")
 

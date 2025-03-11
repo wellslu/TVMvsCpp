@@ -102,6 +102,8 @@ class Trainer(AbstractTrainer):
         if test_acc > self.best_acc:
             self.best_acc = test_acc
             self.save_checkpoint(f"{self.model_dir}.pth")
+            traced_model = torch.jit.trace(self.model, torch.rand(1, 1, 28, 28))
+            traced_model.save(f"{self.model_dir}_jit.pth")
 
         return test_loss, test_acc
 
