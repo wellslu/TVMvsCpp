@@ -7,8 +7,8 @@ We explore two different approaches for implementing ResNet models loading and i
     - **1)** Fewer dependencies.
     - **2)** More platform compatibility.
   - Weakness:  
-    - **1)** dDevelopment is more challenging due to the lack of convenient data structures (e.g., tensors) and operations (e.g., convolution, pooling). 
-    - **2)** cComputational inefficiency, despite C++ being a relatively fast programming language itself. Achieving optimal performance requires substantial fine-grained optimization.
+    - **1)** Development is more challenging due to the lack of convenient data structures (e.g., tensors) and operations (e.g., convolution, pooling). 
+    - **2)** Computational inefficiency, despite C++ being a relatively fast programming language itself. Achieving optimal performance requires substantial fine-grained optimization.
 - LibTorch implementation.
   - Strengths: 
     - **1)** Easier development, with a rich set of data structures and functions.
