@@ -182,3 +182,4 @@ CIFAR-10/
 *.pt
 *.tar
 *.ipynb
+*.npz

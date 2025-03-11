@@ -1,3 +1,6 @@
 [submodule "tvm"]
 	path = tvm
 	url = https://github.com/apache/tvm
+[submodule "cpp/resnet/cv2/cnpy"]
+	path = cnpy
+	url = https://github.com/rogersce/cnpy

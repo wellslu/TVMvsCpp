@@ -39,20 +39,22 @@ def main():
             transforms.Normalize((0.1307,), (0.3081,))
         ])
     
-    # start = time.time()
-    log(f"Start inference 1000 times with {model_name}: {time.time()}", model_name)
+    img = Image.open(args.image)
+    data = transform(img)
+    input_data = data.reshape(1, 1, 28, 28)
+    input_data = np.array(input_data.numpy(), dtype="float64")
+    
+    start = time.time()
+    log(f"Start inference 1000 times with {model_name}: {start}", model_name)
 
-    for i in range(1):
-        img = Image.open(args.image)
-        data = transform(img)
-        input_data = data.reshape(1, 1, 28, 28)
-        input_data = np.array(input_data.numpy(), dtype="float32")
+    for i in range(1000):
         module.set_input("input", input_data)
         module.run()
         output = module.get_output(0).asnumpy()
     
-    log(f"End inference 1000 times with {model_name}: {time.time()}", model_name)
-    # print(f"Inference 1000 times with reload the same image: {time.time() - start}")
+    end = time.time()
+    log(f"End inference 1000 times with {model_name}: {end}", model_name)
+    print(f"Inference 1000 times with reload the same image: {(end - start) / 1000}")
 
     print("Done")
 
