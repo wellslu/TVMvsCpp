@@ -4,7 +4,7 @@
 #include "resnet.hpp"
 using namespace std;
 
-const string WEIGHTS_FOLDER = "../../../../tvm_model_ckpts/";
+const string WEIGHTS_FOLDER = "/mnt/";
 
 vector<cv::Mat> get_input(string image_path)
 {
