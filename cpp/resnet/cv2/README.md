@@ -1,5 +1,8 @@
 # Steps:
 
+- Get the model weights:
+    - Use pytorch/convert_pth_2_npz.py to convert the model weights exported from PyTorch to a npz data that can be loaded by the C++ program.
+
 - Install cnpy:
     - Build [cnpy](https://github.com/rogersce/cnpy/tree/master) from source code.
 
