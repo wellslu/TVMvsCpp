@@ -18,6 +18,7 @@
     # install opencv
     sudo apt install libopencv-dev
     ```
+    - Update the C++ include path to include the headers of OpenCV or specify the path in the Makefile (e.g. /usr/include/opencv4).
 - Set the model path **WEIGHTS_FOLDER** and the **imagePath** in main.cpp.
 - Compile the source code:
     ```bash
